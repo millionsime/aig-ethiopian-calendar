@@ -1,0 +1,2 @@
+# Zero runtime dependencies by design (spec §4: no third-party calendar
+# library; the algorithm is self-contained and anchored to verified dates).
