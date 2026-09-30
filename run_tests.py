@@ -4,6 +4,7 @@
 # The same tests are also collectable by pytest if it is available.
 import os
 import sys
+import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

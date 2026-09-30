@@ -23,8 +23,8 @@ boot_session = "aig_ethiopian_calendar.boot.boot_session"
 # Assets: included unconditionally BUT the JS self-disables without the
 # boot flag (single early return) - keeps flag flips cache-simple.
 # NOTE: bump ?v= on every JS/CSS change - these are served with long cache.
-app_include_css = "/assets/aig_ethiopian_calendar/css/ethiopian_calendar.css?v=3"
-app_include_js = "/assets/aig_ethiopian_calendar/js/ethiopian_calendar.js?v=3"
+app_include_css = "/assets/aig_ethiopian_calendar/css/ethiopian_calendar.css?v=4"
+app_include_js = "/assets/aig_ethiopian_calendar/js/ethiopian_calendar.js?v=4"
 
 # Jinja filter for print formats (spec §6H):
 #   {{ ethiopian_date(doc.posting_date) }}

@@ -1,4 +1,6 @@
-/* AIG Ethiopian Calendar - hint styling (matches ERPNext control layout) */
+/* AIG Ethiopian Calendar - hint + picker styling (matches ERPNext controls) */
+
+/* ---------- v1 hint (unchanged behaviour) ---------- */
 .aig-eth-date-hint {
 	font-size: 11px;
 	color: #6b7280;
@@ -9,4 +11,133 @@
 
 .aig-eth-date-hint.aig-eth-hint-err {
 	color: #b91c1c;
+}
+
+/* ---------- Phase 2: picker button inside the control ---------- */
+.control-input-wrapper {
+	position: relative; /* anchor for the button + popover */
+}
+
+.control-input-wrapper .aig-eth-btn {
+	position: absolute;
+	right: 26px; /* leave the native calendar icon its place */
+	top: 50%;
+	transform: translateY(-50%);
+	border: 1px solid #d1d5db;
+	background: #fff;
+	color: #4b5563;
+	font-size: 10px;
+	line-height: 1;
+	padding: 3px 5px;
+	border-radius: 4px;
+	cursor: pointer;
+	z-index: 3;
+}
+
+.control-input-wrapper .aig-eth-btn:hover {
+	background: #f3f4f6;
+	border-color: #9ca3af;
+}
+
+/* ---------- popover (month grid) ---------- */
+.aig-eth-pop {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	background: #fff;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	padding: 8px;
+	min-width: 230px;
+	font-size: 12px;
+}
+
+.aig-eth-head {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+.aig-eth-head .aig-eth-month {
+	flex: 1;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	padding: 3px 4px;
+	font-size: 12px;
+	background: #fff;
+}
+
+.aig-eth-head .aig-eth-year {
+	width: 70px;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	padding: 3px 4px;
+	font-size: 12px;
+}
+
+.aig-eth-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px;
+}
+
+.aig-eth-grid .aig-eth-wd {
+	text-align: center;
+	color: #9ca3af;
+	font-size: 10px;
+	padding: 2px 0;
+}
+
+.aig-eth-grid .aig-eth-day {
+	border: none;
+	background: transparent;
+	border-radius: 4px;
+	padding: 4px 0;
+	cursor: pointer;
+	font-size: 12px;
+	text-align: center;
+}
+
+.aig-eth-grid .aig-eth-day:hover {
+	background: #e5e7eb;
+}
+
+.aig-eth-grid .aig-eth-day-today {
+	outline: 1px solid #9ca3af;
+}
+
+.aig-eth-foot {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 6px;
+	color: #6b7280;
+	font-size: 10px;
+}
+
+.aig-eth-foot .aig-eth-today {
+	border: 1px solid #d1d5db;
+	background: #fff;
+	border-radius: 4px;
+	font-size: 11px;
+	padding: 2px 8px;
+	cursor: pointer;
+}
+
+.aig-eth-foot .aig-eth-today:hover {
+	background: #f3f4f6;
+}
+
+/* dark mode (Frappe toggles html[data-theme=dark]) */
+[data-theme="dark"] .aig-eth-pop,
+[data-theme="dark"] .control-input-wrapper .aig-eth-btn {
+	background: #1f2937;
+	border-color: #374151;
+	color: #d1d5db;
+}
+
+[data-theme="dark"] .aig-eth-grid .aig-eth-day:hover {
+	background: #374151;
 }

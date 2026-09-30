@@ -5,10 +5,11 @@ Gregorian dates remain the canonical internal representation everywhere —
 this app is a **presentation/input adapter only**. It never touches Frappe or
 ERPNext core, the database, or any accounting logic.
 
-**Status: Phase 1 complete and tested (conversion engine, 31/31); Phase-3
-preview live — Ethiopian date hints render under every Date field in form
-view (both editable and read-only modes), browser-verified on 2026-09-30.**
-Phases 2 (EC input/picker), 4 (filters), 5 (list/table rendering) and the
+**Status: Phase 1 + Phase 2 complete and tested (35/35) — conversion
+engine, Ethiopian date picker on every editable Date field, and the
+JS↔Python engine mirror cross-check. Phase-3 preview (display hints under
+every Date field) ships in the same client layer. All browser-verified
+2026-09-30.** Phases 4 (filters), 5 (list/table rendering) and the
 roadmap below are still staged.
 
 ## Architecture
@@ -87,6 +88,20 @@ bootinfo) · `app_include_js` / `app_include_css` (assets self-disable
 without the flag; bump the `?v=` cache-buster on every asset change) ·
 `after_install` version check via `install.check_compatibility`.
 
+## The Ethiopian picker (Phase 2)
+
+Every editable Date field gets a small `ዓ.ም.` button next to the native
+icon. It opens a 13-month Ethiopian grid (month dropdown, year field,
+weekday row, "Pagumen 5/6" leap note, Today). Choosing a day writes the
+**Gregorian** date through the field's own change event — stored values
+stay Gregorian-canonical, Frappe's machinery and native picker remain
+untouched, and read-only fields are left alone (hint only).
+
+The JS file is a UMD module: PART 1 is the pure engine (identical math to
+`calendar/ethiopian.py`, same anchor), PART 2 the flag-gated UI. The
+mirror tests feed the committed file to node and assert parity with the
+Python engine (see Testing).
+
 **Deployment note (docker/frappe_docker):** bench links
 `sites/assets/<app>` on the *backend* container only; the *frontend*
 container serves `/assets/*`, so the app's `public/` tree must be present
@@ -111,7 +126,11 @@ calendars), Pagumen 5/6, invalid dates (32 Meskerem, 6 Pagumen common
 year, …), full-year day-by-day round-trips (common + leap + boundary
 years), Gregorian Feb 28/29, Enkutatash-week sweep, 1900/2100 extremes,
 parser format whitelist, filter-range conversion, helper coercion,
-Addis-Ababa "today".
+Addis-Ababa "today" — plus the JS↔Python mirror battery: GC→EC, EC→GC,
+invalid-date rejection parity, picker month-grid weekday/length facts,
+and a sampled day sweep, executed by piping the committed engine file
+into node (host node, or the frappe_docker backend container's node via
+`docker exec -i`).
 
 ## Rollback
 

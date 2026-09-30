@@ -1,11 +1,33 @@
-# Acceptance Report — aig_ethiopian_calendar (updated 2026-09-30)
+# Acceptance Report — aig_ethiopian_calendar (updated 2026-09-30, Phase 2)
 
-Per spec §29. Honest scope statement: **Phase 1 (conversion engine) is
-complete and tested (31/31), and the Phase-3 preview — Ethiopian date
-hints under every Date field in form view — is implemented, deployed and
-browser-verified (2026-09-30).** Phases 2 (picker/input), 4 (filters),
-5 (list/table rendering) and beyond are NOT yet implemented. No claim of
-system-wide support is made.
+Per spec §29. Honest scope statement: **Phase 1 (conversion engine) and
+Phase 2 (Ethiopian date picker + JS engine mirror) are complete, tested
+(35/35) and browser-verified (2026-09-30); the Phase-3 preview (display
+hints under every Date field) ships in the same client layer.** Phases 4
+(filters), 5 (list/table rendering) and beyond are NOT yet implemented.
+No claim of system-wide support is made.
+
+## Phase 2 summary (this update)
+
+- `public/js/ethiopian_calendar.js` restructured: PART 1 is a pure engine
+  (no DOM/frappe at module scope) exported via UMD — `module.exports`
+  under node, `window.AIGEthiopianCalendar` in the browser — so the mirror
+  test exercises the exact committed bytes. PART 2 is the flag-gated UI
+  (hints + picker), fail-safe, no monkey patching.
+- Picker: a `ዓ.ም.` button on each editable Date field opens an EC month
+  grid (13 months, correct Pagumen 5/6, weekday grid). Picking a day
+  writes the Gregorian value through the field's own change event — the
+  stored value stays Gregorian-canonical. Reopening syncs to the field's
+  current value; Today button included; Escape/outside-click closes.
+- Read-only fields (no input) get hints only — verified regression.
+- Mirror tests now run the engine under node (host or the backend
+  container's node via `docker exec -i`, file piped via stdin, bytes-safe):
+  GC→EC and EC→GC vs Python, invalid-date rejection parity, month-grid
+  weekday/length facts, and a sampled day-by-day sweep across the
+  interesting years. **35/35 pass.**
+- Browser-verified (inv.admin, Material Request): pick 15 Meskerem 2019 →
+  doc value 2026-09-25; pick 6 Pagumen 2019 (Nikul) → 2027-09-11; hints
+  update live; native Frappe datepicker untouched.
 
 ## 1. Files created
 
@@ -60,7 +82,8 @@ Not yet (Phase 5). `format_ethiopian_date` is the single formatter the
 rendering layer will call.
 
 ## 9. Known unsupported areas (honest list)
-- No Ethiopian date picker / typed-EC input (Phase 2) — display hints only.
+- Picker is click-driven; typing a raw EC string ("23/01/2019 EC") into a
+  date field is not accepted yet (Phase 4 filter/parser integration).
 - No list/report filter or table rendering integration (Phases 4–5); the
   list view itself shows no hints yet.
 - No dashboard/timeline/search integration (Phase 5).
@@ -75,10 +98,13 @@ rendering layer will call.
   fail-safe to standard UI on any error (spec §14/§16).
 
 ## 11. Test results
-**31 passed, 0 failed** (`python3 run_tests.py`, 2026-09-30; includes
-`test_js_mirror::test_js_mirror_matches_python`, which cross-checks the
-browser engine against the Python engine and skips only when node is
-unavailable).
+**35 passed, 0 failed** (`python3 run_tests.py`, 2026-09-30). The four
+`test_js_mirror_*` tests execute the actual JS engine file under node
+(host, or the frappe_docker backend container's node via `docker exec -i`
+with the file piped through stdin) and assert parity with the Python
+engine in both directions, invalid-input rejection, month-grid facts,
+and a sampled day-by-day sweep. They skip with a note when no node is
+available.
 Coverage: verified external anchors (millennium 2000 EC = 2007-09-12;
 Enkutatash 2019 EC = 2026-09-11; NY 2016 EC = 2023-09-12), New Year table
 2015–2030, both leap rules, Pagumen 5/6 incl. round-trip, invalid dates
