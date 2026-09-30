@@ -5,9 +5,11 @@ Gregorian dates remain the canonical internal representation everywhere —
 this app is a **presentation/input adapter only**. It never touches Frappe or
 ERPNext core, the database, or any accounting logic.
 
-**Status: Phase 1 complete and tested (conversion engine, 30/30).**
-Phases 2–7 (picker, form fields, filters, rendering, print, flags) are staged
-in this repo's `public/js/` and the roadmap below.
+**Status: Phase 1 complete and tested (conversion engine, 31/31); Phase-3
+preview live — Ethiopian date hints render under every Date field in form
+view (both editable and read-only modes), browser-verified on 2026-09-30.**
+Phases 2 (EC input/picker), 4 (filters), 5 (list/table rendering) and the
+roadmap below are still staged.
 
 ## Architecture
 
@@ -31,8 +33,11 @@ aig_ethiopian_calendar/
 ├── calendar/          conversion engine (constants, ethiopian, gregorian, validation)
 ├── utils/             parser (explicit formats only) + helpers (timezone-safe today)
 ├── api/               THE public boundary: conversion.py + formatting.py
+├── boot.py            boot_session hook: publishes the feature flag to the client
+├── public/js          browser engine mirror + hint layer (flag-gated, fail-safe)
+├── public/css         hint styling
 ├── tests/             zero-dependency suite (also pytest-collectable)
-└── hooks.py           jinja print filter, version gate, feature flag
+└── hooks.py           jinja print filter, include_js/css (?v= cache-busted), version gate
 ```
 
 ## Installation
@@ -77,9 +82,17 @@ Print formats (Jinja, explicit opt-in per format):
 ## Hooks used (complete list)
 
 `app_name/app_title/...` metadata · `required_min/max_frappe_version` ·
-`jinja_methods.ethiopian_date` · (Phases 3–5 will add `app_include_js/css`,
-gated behind the site-config flag; `before_install` version check via
-`install.check_compatibility`).
+`jinja_methods.ethiopian_date` · `boot_session` (publishes the flag via
+bootinfo) · `app_include_js` / `app_include_css` (assets self-disable
+without the flag; bump the `?v=` cache-buster on every asset change) ·
+`after_install` version check via `install.check_compatibility`.
+
+**Deployment note (docker/frappe_docker):** bench links
+`sites/assets/<app>` on the *backend* container only; the *frontend*
+container serves `/assets/*`, so the app's `public/` tree must be present
+at `/home/frappe/frappe-bench/assets/aig_ethiopian_calendar/` there too.
+After changing `public/js|css`, copy to both containers and clear site
+cache; the `?v=` in `hooks.py` busts browser caches.
 
 ## Supported versions
 
@@ -108,9 +121,12 @@ Addis-Ababa "today".
    app; ERPNext continues on Gregorian with zero data changes (the app owns
    no date columns and never wrote to ERPNext documents).
 
-## Known limitations (Phase 1)
+## Known limitations
 
-- No UI yet (picker/field/filter integration are Phases 2–5).
+- Display hints only — typing/picking dates in Ethiopian calendar is
+  Phase 2 (not implemented).
+- List view, report filters and table column rendering are untouched
+  (Phases 4–5).
 - Date range validated 1 Jan 1900 → 2100 in tests; engine is ordinal-based
   and exact far beyond, but treat untested centuries as untested.
 - Timezone: date-only values are treated as dates; "today" is Addis Ababa

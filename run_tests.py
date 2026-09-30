@@ -8,10 +8,12 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aig_ethiopian_calendar.tests import (  # noqa: E402
-    test_boundaries, test_conversion, test_parser, test_ui_cases,
+    test_boundaries, test_conversion, test_js_mirror, test_parser,
+    test_ui_cases,
 )
 
-MODULES = [test_conversion, test_parser, test_boundaries, test_ui_cases]
+MODULES = [test_conversion, test_parser, test_boundaries, test_ui_cases,
+           test_js_mirror]
 
 
 def main():
